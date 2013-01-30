@@ -17,3 +17,5 @@ libraryDependencies ++= Seq(
   )
 
 seq(cucumberSettings : _*)
+
+seq(Revolver.settings: _*) //Restart the server whenever code changes
