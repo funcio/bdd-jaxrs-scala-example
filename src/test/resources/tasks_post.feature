@@ -5,7 +5,7 @@ Feature: Create a new task
   I want to create a task
 
   Scenario: Create a task OK
-    When I POST /tasks
+    When I POST /tasks with
     """
     Content-Type: application/json
 
@@ -13,7 +13,7 @@ Feature: Create a new task
     """
     Then the response status is 201
     And the response header Link matches /tasks/[0-9]+
-    And when I GET /tasks/@id
+    When I GET @Link
     Then the response status is 200
     And response["description"] is "Write a Scala BDD example using JaxRS"
     And response["done"] is false
