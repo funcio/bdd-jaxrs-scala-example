@@ -57,7 +57,11 @@ class RestSteps extends ScalaDsl with EN with ShouldMatchers{
   }
 
   Then( """^the response header (.+) matches (.*)$""") {
-    (headerName: String, headerPattern: String) =>
+    (headerName: String, headerPattern: String) => {
+      val headerValue:String = lastResponse.headers.get(headerName).get.toString();
+      assert(!headerPattern.r.findFirstIn(headerValue).isEmpty)
+
+    }
   }
 
   Then( """^response\["([^"]*)"\] is (.+)$""") {

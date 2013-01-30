@@ -13,7 +13,7 @@ class TasksResource(tasksRepository:TasksRepository) {
   @POST
   def createTask(body:NewTaskRequest) = {
     val id = tasksRepository.create(body.description)
-    Response.created(new URI("/tasks/%d".format(id))).build()
+    Response.created(new URI("/%d".format(id))).build()
   }
 
 }

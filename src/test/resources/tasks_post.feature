@@ -12,7 +12,7 @@ Feature: Create a new task
     {"description":"Write a Scala BDD example using JaxRS"}
     """
     Then the response status is 201
-    And the response header Link matches /tasks/[0-9]+
+    And the response header Location matches https?://[^/]+/tasks/[0-9]+
     When I GET @Link
     Then the response status is 200
     And response["description"] is "Write a Scala BDD example using JaxRS"
