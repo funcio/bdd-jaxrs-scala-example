@@ -7,7 +7,7 @@ import util.Properties
 import javax.ws.rs.ext.{ContextResolver, Provider}
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
-import api.TasksResource
+import api.{TasksRepository, TasksResource}
 
 object Context{
 
@@ -26,7 +26,7 @@ object Context{
     mapper
   }
 
-  val tasksResource = new TasksResource
+  val tasksResource = new TasksResource(new TasksRepository)
 
   val instances:Set[AnyRef] = Set[AnyRef](
     tasksResource,

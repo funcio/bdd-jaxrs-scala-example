@@ -12,7 +12,8 @@ libraryDependencies ++= Seq(
   "com.sun.jersey" % "jersey-servlet" % "1.17",
   "com.fasterxml.jackson.module" % "jackson-module-scala_2.10" % "2.1.3",
   "com.fasterxml.jackson.jaxrs" % "jackson-jaxrs-json-provider" % "2.1.2",
-  "org.scalatest" % "scalatest_2.10.0" % "2.0.M5" % "test"
+  "org.scalatest" % "scalatest_2.10.0" % "2.0.M5" % "test",
+  "org.mockito" % "mockito-all" % "1.9.5" % "test"
   )
 
 seq(cucumberSettings : _*)

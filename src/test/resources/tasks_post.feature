@@ -7,6 +7,8 @@ Feature: Create a new task
   Scenario: Create a task OK
     When I POST /tasks
     """
+    Content-Type: application/json
+
     {"description":"Write a Scala BDD example using JaxRS"}
     """
     Then the response status is 201
