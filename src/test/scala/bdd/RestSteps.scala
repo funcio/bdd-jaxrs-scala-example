@@ -6,6 +6,7 @@ import java.net.HttpURLConnection
 import org.scalatest.matchers.ShouldMatchers
 import collection.JavaConversions._
 import util.matching.Regex
+import collection.mutable
 
 case class Response(status:Int, headers:Map[String,Seq[String]],body:String)
 
@@ -17,19 +18,29 @@ class RestSteps extends ScalaDsl with EN with ShouldMatchers{
 
   When( """^I (GET|POST|PUT|DELETE) ([^\s]+) with$""") {
     (verb:String, path: String, headersAndBody: String) =>
-      sendRequest(verb, replaceVars(path), headersAndBody)
+      sendRequest(verb, path, headersAndBody)
   }
 
   When( """^I (GET|POST|PUT|DELETE) ([^\s]+)$""") {
     (verb:String, path: String) =>
-      sendRequest(verb, replaceVars(path))
+      sendRequest(verb, path)
   }
 
+  When( """^I follow (.+)""") {
+    (name: String, headersAndBody: String) =>
+      sendRequest("GET", lastResponse.headers.get(name).get.head, headersAndBody)
+  }
 
   val httpHeaderRegexp:Regex = """^([A-Za-z\-]+):(.+)$""".r
 
   private def sendRequest(verb: String, path: String, headersAndBody: String = "\n\n") {
-    val url = new URL(baseUrl + path)
+    val url = {
+      if (path.startsWith("http")) {
+        new URL(path)
+      } else {
+        new URL(baseUrl + path)
+      }
+    }
     val conn = url.openConnection.asInstanceOf[HttpURLConnection]
     val headersAndBodyParts = headersAndBody.split("\n")
     val headers = headersAndBodyParts.takeWhile(httpHeaderRegexp.pattern.matcher(_).matches())
@@ -37,18 +48,15 @@ class RestSteps extends ScalaDsl with EN with ShouldMatchers{
     val requestBody = headersAndBodyParts.dropWhile(httpHeaderRegexp.pattern.matcher(_).matches()).mkString("\n")
     headers.foreach(h => conn.setRequestProperty(h._1, h._2))
     conn.setRequestMethod(verb)
-    conn.setDoOutput(true)
-    val os = conn.getOutputStream
-    os.write(requestBody.getBytes)
-    os.flush()
-    os.close()
+    if (!requestBody.isEmpty) {
+      conn.setDoOutput(true)
+      val os = conn.getOutputStream
+      os.write(requestBody.getBytes)
+      os.flush()
+      os.close()
+    }
     val responseBody = scala.io.Source.fromInputStream(conn.getInputStream).mkString
     this.lastResponse = Response(conn.getResponseCode, conn.getHeaderFields.mapValues(_.toSeq).toMap, responseBody)
-  }
-
-  private def replaceVars(s:String) = {
-    val link = lastResponse.headers.getOrElse("Link",Seq()).headOption.getOrElse("???")
-    s.replaceAll("@Link",link)
   }
 
   Then( """^the response status is (\d+)$""") {

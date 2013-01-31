@@ -15,4 +15,6 @@ class TasksRepository {
     lastId
   }
 
+  def find(id: Int): Option[Task] = tasks.get(id);
+
 }

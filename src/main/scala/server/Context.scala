@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.{SerializationFeature, ObjectMapper}
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import util.Properties
-import javax.ws.rs.ext.{ContextResolver, Provider}
+import javax.ws.rs.ext.{ExceptionMapper, ContextResolver, Provider}
 import javax.ws.rs.Produces
-import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.{Response, MediaType}
 import api.{TasksRepository, TasksResource}
 
 object Context{
@@ -30,6 +30,7 @@ object Context{
 
   val instances:Set[AnyRef] = Set[AnyRef](
     tasksResource,
+    new OptionNotFoundMapper(),
     new JacksonContextResolver(mapper))
 
 }
@@ -39,4 +40,10 @@ object Context{
 class JacksonContextResolver(mapper:ObjectMapper) extends ContextResolver[ObjectMapper]{
 
   def getContext(clazz: Class[_]) = mapper
+}
+
+@Provider
+class OptionNotFoundMapper extends ExceptionMapper[java.util.NoSuchElementException] {
+  def toResponse(exception: NoSuchElementException): Response = Response.status(404).
+    entity(exception.getMessage).`type`("text/plain").build()
 }

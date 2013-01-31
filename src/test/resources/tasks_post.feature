@@ -13,7 +13,11 @@ Feature: Create a new task
     """
     Then the response status is 201
     And the response header Location matches https?://[^/]+/tasks/[0-9]+
-    When I GET @Link
+
+    When I follow Location
+    """
+    Accept: application/json
+    """
     Then the response status is 200
     And response["description"] is "Write a Scala BDD example using JaxRS"
     And response["done"] is false
